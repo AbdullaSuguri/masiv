@@ -11,6 +11,7 @@ int j;
 int score = 0;
 int scorast;
 int povorot;
+int maxY;
 
 int angle;
 byte frame[8][12] = {
@@ -39,9 +40,6 @@ byte b[3][2] = {
   { 0, 1 },
   { 1, 1 }
 };
-
-
-
 void clear_line() {
   bool full = true;
   for (int i = 0; i < 8; i++)
@@ -153,6 +151,8 @@ void setup() {
 
 void loop() {
   kn(0);
+  if (angle%2==0) maxY=5;
+  else maxY = 6;
   i++;
   int axel;
   Serial.println(digitalRead(2));
@@ -177,12 +177,14 @@ void loop() {
   //down
   if (digitalRead(0) == 0) {
     if (down == 0)
-      if ((y < 7) && (frame[y + 1][x] == 0))
+      if ((y < maxY) && (frame[y + 1][x] == 0))
         y++;
     down = 1;
   } else down = 0;
   if (digitalRead(3) == 0) {
     if (povorot == 0) {
+      if(y=6)
+         y=5;
       angle++;
       angle %= 4;
       povorot = 1;
@@ -203,3 +205,6 @@ void loop() {
 
   ser.renderBitmap(frame, 8, 12);
 }
+
+
+
