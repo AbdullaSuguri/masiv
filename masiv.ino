@@ -40,20 +40,25 @@ byte b[3][2] = {
   { 0, 1 },
   { 1, 1 }
 };
+
 void clear_line() {
-  bool full = true;
-  for (int i = 0; i < 8; i++)
-    if (frame[i][0] == 0) {
-      full = false;
-      break;
+  for (int a = 0; a < 12; a++) {
+    bool full = true;
+    for (int i = 0; i < 8; i++)
+      if (frame[i][a] == 0) {
+        full = false;
+        break;
+      }
+    if (full) {
+      for (int i = 0; i < 8; i++) {
+        for (int j = a; j < 11; j++)
+
+          frame[i][j] = frame[i][j + 1];
+        frame[i][11] = 0;
+      }
+      score += 1;
+      a--;
     }
-  if (full) {
-    for (int i = 0; i < 8; i++) {
-      for (int j = 0; j < 11; j++)
-        frame[i][j] = frame[i][j + 1];
-      frame[i][11] = 0;
-    }
-    score += 100;
   }
 
   Serial.print("Score: ");
@@ -69,7 +74,7 @@ void game_over() {
         break;
       }
     if (full) {
-      ser.renderBitmap(frame_bd, 8, 12); 
+      ser.renderBitmap(frame_bd, 8, 12);
       Serial.println("Game over:");
       delay(10000);
       break;
@@ -82,33 +87,33 @@ bool kn(int data) {
     for (int i = 0; i < 8; i++)
       for (int j = 0; j < 12; j++)
         frame_bd[i][j] = frame[i][j];
-	
+
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 2; j++)
       switch (angle) {
         case 0:
           {
-            if ((b[i][j] == 1)&&((y + i)<8)&&((x+j)<12))
+            if ((b[i][j] == 1) && ((y + i) < 8) && ((x + j) < 12))
               frame[y + i][x + j] = data;
             break;
           }
         case 1:
           {
-            if ((b[2 - i][j] == 1)&&((y + j)<8)&&((x+i)<12))
+            if ((b[2 - i][j] == 1) && ((y + j) < 8) && ((x + i) < 12))
               frame[y + j][x + i] = data;
 
             break;
           }
         case 2:
           {
-            if ((b[2 - i][1-j] == 1)&&((y + i)<8)&&((x+j)<12))
+            if ((b[2 - i][1 - j] == 1) && ((y + i) < 8) && ((x + j) < 12))
               frame[y + i][x + j] = data;
 
             break;
           }
         case 3:
           {
-            if ((b[i][1-j] == 1)&&((y + j)<8)&&((x+i)<12))
+            if ((b[i][1 - j] == 1) && ((y + j) < 8) && ((x + i) < 12))
               frame[y + j][x + i] = data;
             break;
           }
@@ -117,15 +122,15 @@ bool kn(int data) {
             break;
           }
       }
-  if(data == 1){
+  if (data == 1) {
     int cnt_f = 0;
     int cnt_f_bd = 0;
-    for(int i = 0; i<8; i++)
-      for(int j = 0; j<12; j++){
-        if(frame[i][j] == 1) cnt_f++;
-        if(frame_bd[i][j] == 1) cnt_f_bd++;
+    for (int i = 0; i < 8; i++)
+      for (int j = 0; j < 12; j++) {
+        if (frame[i][j] == 1) cnt_f++;
+        if (frame_bd[i][j] == 1) cnt_f_bd++;
       }
-    if (cnt_f_bd > cnt_f){
+    if (cnt_f_bd > cnt_f) {
       for (int i = 0; i < 8; i++)
         for (int j = 0; j < 12; j++)
           frame[i][j] = frame_bd[i][j];
@@ -133,9 +138,6 @@ bool kn(int data) {
     } else return true;
   }
 }
-
-
-
 
 void setup() {
 
@@ -151,11 +153,10 @@ void setup() {
 
 void loop() {
   kn(0);
-  if (angle%2==0) maxY=5;
+  if (angle % 2 == 0) maxY = 5;
   else maxY = 6;
   i++;
   int axel;
-  Serial.println(digitalRead(2));
   if (digitalRead(2) == 1) axel = 1;
   else axel = 0;
   if (i >= (10 + axel * 90)) {
@@ -183,8 +184,8 @@ void loop() {
   } else down = 0;
   if (digitalRead(3) == 0) {
     if (povorot == 0) {
-      if(y=6)
-         y=5;
+      if (y == 6)
+        y = 5;
       angle++;
       angle %= 4;
       povorot = 1;
@@ -205,6 +206,3 @@ void loop() {
 
   ser.renderBitmap(frame, 8, 12);
 }
-
-
-
