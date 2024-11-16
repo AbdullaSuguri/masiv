@@ -1,5 +1,21 @@
 #include <Arduino_LED_Matrix.h>
+struct Figures {
+  byte w, h;
+  byte matrix[4][2];
+};
 ArduinoLEDMatrix ser;
+Figures g[7] = {
+  { 2, 3, { { 1, 0 }, { 1, 0 }, { 1, 1 }, { 0, 0 } } },
+  { 2, 3, { { 0, 1 }, { 0, 1 }, { 1, 1 }, { 0, 0 } } },
+  { 2, 3, { { 1, 0 }, { 1, 1 }, { 1, 0 }, { 0, 0 } } },
+  { 1, 4, { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 } } },
+  { 2, 3, { { 1, 0 }, { 1, 1 }, { 0, 1 }, { 0, 0 } } },
+  { 2, 3, { { 0, 1 }, { 1, 1 }, { 1, 0 }, { 0, 0 } } },
+  { 2, 2, { { 1, 1 }, { 1, 1 }, { 0, 0 }, { 0, 0 } } }
+};
+
+byte fn = random(6);
+
 int y = 4;
 int x = 9;
 int left;
@@ -35,12 +51,6 @@ byte frame_bd[8][12] = {
   { 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
   { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 }
 };
-byte b[3][2] = {
-  { 0, 1 },
-  { 0, 1 },
-  { 1, 1 }
-};
-
 void clear_line() {
   for (int a = 0; a < 12; a++) {
     bool full = true;
@@ -88,32 +98,32 @@ bool kn(int data) {
       for (int j = 0; j < 12; j++)
         frame_bd[i][j] = frame[i][j];
 
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 2; j++)
+  for (int i = 0; i < g[fn].h; i++) 
+    for (int j = 0; j < g[fn].w; j++) 
       switch (angle) {
         case 0:
           {
-            if ((b[i][j] == 1) && ((y + i) < 8) && ((x + j) < 12))
+            if ((g[fn].matrix[i][j] == 1) && ((y + i) < 8) && ((x + j) < 12)) 
               frame[y + i][x + j] = data;
             break;
           }
         case 1:
           {
-            if ((b[2 - i][j] == 1) && ((y + j) < 8) && ((x + i) < 12))
+            if ((g[fn].matrix[g[fn].h - 1 - i][j] == 1) && ((y + j) < 8) && ((x + i) < 12)) 
               frame[y + j][x + i] = data;
 
             break;
           }
         case 2:
           {
-            if ((b[2 - i][1 - j] == 1) && ((y + i) < 8) && ((x + j) < 12))
+            if ((g[fn].matrix[g[fn].h - 1 - i][g[fn].w - 1 - j] == 1) && ((y + i) < 8) && ((x + j) < 12)) 
               frame[y + i][x + j] = data;
 
             break;
           }
         case 3:
           {
-            if ((b[i][1 - j] == 1) && ((y + j) < 8) && ((x + i) < 12))
+            if ((g[fn].matrix[i][g[fn].w - 1 - j] == 1) && ((y + j) < 8) && ((x + i) < 12)) 
               frame[y + j][x + i] = data;
             break;
           }
@@ -141,6 +151,15 @@ bool kn(int data) {
 
 void setup() {
 
+  Figures gg;
+  gg.w = 2;
+  gg.h = 3;
+  gg.matrix[0][0] = 1;
+  gg.matrix[0][1] = 0;
+  gg.matrix[1][0] = 1;
+  gg.matrix[1][1] = 0;
+  gg.matrix[2][0] = 1;
+  gg.matrix[2][1] = 1;
   Serial.begin(9600);
   ser.begin();
   ser.renderBitmap(frame, 8, 12);
@@ -198,6 +217,7 @@ void loop() {
     game_over();
     x = 11;
     y = 1;
+    fn=random(6);
     kn(0);
     kn(1);
   }
